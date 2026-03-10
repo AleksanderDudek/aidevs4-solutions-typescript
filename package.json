@@ -1,0 +1,21 @@
+{
+  "name": "ai-devs4",
+  "version": "1.0.0",
+  "description": "AI_devs 4 - rozwiązania zadań",
+  "type": "module",
+  "scripts": {
+    "task": "tsx src/index.ts",
+    "s01e01": "tsx src/tasks/s01e01.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "dotenv": "^16.4.5",
+    "papaparse": "^5.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/papaparse": "^5.3.14",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}
