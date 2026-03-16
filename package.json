@@ -8,7 +8,8 @@
     "s01e01": "tsx src/tasks/s01e01.ts",
     "s01e02": "tsx src/tasks/s01e02.ts",
     "s01e04": "tsx src/tasks/s01e04.ts",
-    "s01e03": "tsx src/tasks/s01e03.ts"
+    "s01e03": "tsx src/tasks/s01e03.ts",
+    "s01e05": "tsx src/tasks/s01e05.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
