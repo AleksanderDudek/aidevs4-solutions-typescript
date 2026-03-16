@@ -17,7 +17,7 @@
 import "dotenv/config";
 import path from "path";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
-import Anthropic from "@anthropic-ai/sdk";
+import { getProvider, type ContentBlock } from "../lib/llm/index.js";
 import { submitAnswer } from "../lib/hub.js";
 
 const TASK = "sendit";
@@ -26,7 +26,7 @@ const ROUTES_CACHE = path.join(TASK_DIR, "trasy-wylaczone-vision.txt");
 const DECLARATION_CACHE = path.join(TASK_DIR, "declaration.txt");
 
 const apiKey = process.env.AG3NTS_API_KEY!;
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const llm = getProvider();
 
 if (!existsSync(TASK_DIR)) mkdirSync(TASK_DIR, { recursive: true });
 
@@ -39,35 +39,23 @@ async function analyseExcludedRoutesImage(): Promise<string> {
   }
 
   console.log("🖼️  Downloading trasy-wylaczone.png …");
-  const imgRes = await fetch("https://REDACTED_HUB_URL/dane/doc/trasy-wylaczone.png");
+  const hubBase = process.env.HUB_BASE_URL ?? "https://REDACTED_HUB_URL";
+  const imgRes = await fetch(`${hubBase}/dane/doc/trasy-wylaczone.png`);
   const buf = await imgRes.arrayBuffer();
   const b64 = Buffer.from(buf).toString("base64");
 
   console.log("🔍 Analysing image with vision …");
-  const msg = await client.messages.create({
-    model: "claude-opus-4-5",
-    max_tokens: 2048,
-    messages: [
-      {
-        role: "user",
-        content: [
-          {
-            type: "image",
-            source: { type: "base64", media_type: "image/png", data: b64 },
-          },
-          {
-            type: "text",
-            text: `To jest obraz z dokumentacji systemu SPK. Zawiera listę lub tabelę TRAS WYŁĄCZONYCH Z UŻYTKU.
+  const content: ContentBlock[] = [
+    { type: "image", mediaType: "image/png", data: b64 },
+    {
+      type: "text",
+      text: `To jest obraz z dokumentacji systemu SPK. Zawiera listę lub tabelę TRAS WYŁĄCZONYCH Z UŻYTKU.
 Przepisz dokładnie całą zawartość obrazu - każdy wiersz tabeli z kodem trasy, przebiegiem i statusem.
 Zwróć szczególną uwagę na wszelkie trasy zawierające "Żarnowiec" lub "Gdańsk".
 Odpowiedz w formacie: każda trasa w osobnej linii.`,
-          },
-        ],
-      },
-    ],
-  });
-
-  const result = (msg.content[0] as Anthropic.TextBlock).text;
+    },
+  ];
+  const result = await llm.complete("", content, { model: "claude-opus-4-5", maxTokens: 2048 });
   writeFileSync(ROUTES_CACHE, result, "utf-8");
   console.log("💾 Saved vision result to:", ROUTES_CACHE);
   console.log("📋 Excluded routes from image:\n", result);
@@ -157,17 +145,12 @@ Zasady wypełnienia:
 WAŻNE: Zwróć TYLKO sam tekst deklaracji, bez żadnych wyjaśnień, komentarzy ani markdown.`;
 
   console.log("✍️  Asking Claude to fill in the declaration …");
-  const msg = await client.messages.create({
-    model: "claude-opus-4-5",
-    max_tokens: 1024,
-    messages: [{ role: "user", content: prompt }],
-  });
-
-  const declaration = (msg.content[0] as Anthropic.TextBlock).text.trim();
-  writeFileSync(DECLARATION_CACHE, declaration, "utf-8");
+  const declaration = await llm.complete("", prompt, { model: "claude-opus-4-5", maxTokens: 1024 });
+  const trimmed = declaration.trim();
+  writeFileSync(DECLARATION_CACHE, trimmed, "utf-8");
   console.log("💾 Saved declaration to:", DECLARATION_CACHE);
-  console.log("\n📄 DECLARATION:\n" + declaration);
-  return declaration;
+  console.log("\n📄 DECLARATION:\n" + trimmed);
+  return trimmed;
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────

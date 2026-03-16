@@ -12,7 +12,7 @@
 import "dotenv/config";
 import path from "path";
 import { fetchHubFileCached, callHubApi, submitAnswer } from "../lib/hub.js";
-import { runAgent, type AgentTool } from "../lib/llm.js";
+import { runAgent, type AgentTool } from "../lib/llm/index.js";
 import type { Suspect, PowerPlant, LocationResponse, AccessLevelResponse, FindHimAnswer } from "../types/index.js";
 
 const TASK = "findhim";
@@ -89,7 +89,7 @@ function buildTools(apiKey: string, plants: PowerPlant[]): AgentTool[] {
         name: "check_proximity_to_plants",
         description:
           "Fetches the recorded locations for a suspect and returns the closest nuclear power plant and its distance in km. Call this for every suspect.",
-        input_schema: {
+        inputSchema: {
           type: "object" as const,
           properties: {
             name:    { type: "string", description: "First name of the suspect" },
@@ -156,7 +156,7 @@ function buildTools(apiKey: string, plants: PowerPlant[]): AgentTool[] {
         name: "get_access_level",
         description:
           "Returns the system access level for a suspect. Requires their birth year.",
-        input_schema: {
+        inputSchema: {
           type: "object" as const,
           properties: {
             name:      { type: "string",  description: "First name of the suspect" },
@@ -184,7 +184,7 @@ function buildTools(apiKey: string, plants: PowerPlant[]): AgentTool[] {
         name: "submit_answer",
         description:
           "Submits the final answer to the hub. Call this once you have identified the suspect near a power plant and their access level.",
-        input_schema: {
+        inputSchema: {
           type: "object" as const,
           properties: {
             name:        { type: "string",  description: "First name of the suspect" },

@@ -12,7 +12,7 @@ import "dotenv/config";
 import path from "path";
 import Papa from "papaparse";
 import { fetchHubFileCached, submitAnswer } from "../lib/hub.js";
-import { completeStructured } from "../lib/llm.js";
+import { completeStructured } from "../lib/llm/index.js";
 import type { PersonRaw, PersonTagged, TaggingResponse } from "../types/index.js";
 
 const TASK_DIR = path.resolve("data", "s01e01");
