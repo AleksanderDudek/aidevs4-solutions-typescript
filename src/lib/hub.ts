@@ -81,3 +81,28 @@ export async function fetchHubFileCached(
 
   return content;
 }
+
+/**
+ * Generic POST to a hub API endpoint (e.g. /api/location, /api/accesslevel).
+ * Automatically injects apiKey into the body.
+ */
+export async function callHubApi<T>(
+  endpoint: string,
+  body: Record<string, unknown>,
+  apiKey: string
+): Promise<T> {
+  const url = `${HUB_BASE}${endpoint}`;
+  console.log(`📡 POST ${url} ${JSON.stringify(body)}`);
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ apikey: apiKey, ...body }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Hub API ${endpoint} returned HTTP ${res.status}: ${await res.text()}`);
+  }
+
+  return res.json() as Promise<T>;
+}

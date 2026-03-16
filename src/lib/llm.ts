@@ -11,6 +11,104 @@ function getClient(): Anthropic {
   return _client;
 }
 
+// ─── Agent / Function Calling ────────────────────────────────────────────────
+
+export type ToolHandler = (input: Record<string, unknown>) => Promise<unknown>;
+
+export interface AgentTool {
+  definition: Anthropic.Tool;
+  handler: ToolHandler;
+}
+
+/**
+ * Runs an agent loop with Function Calling (tool_use).
+ * Continues until the model returns stop_reason="end_turn"
+ * or the maxIterations limit is reached.
+ */
+export async function runAgent(
+  systemPrompt: string,
+  userMessage: string,
+  tools: AgentTool[],
+  maxIterations = 20,
+  model = "claude-sonnet-4-20250514"
+): Promise<void> {
+  const client = getClient();
+  const messages: Anthropic.MessageParam[] = [
+    { role: "user", content: userMessage },
+  ];
+
+  for (let i = 0; i < maxIterations; i++) {
+    console.log(`\n🔄 Agent iteration ${i + 1}/${maxIterations}`);
+
+    const response = await client.messages.create({
+      model,
+      max_tokens: 4096,
+      system: systemPrompt,
+      tools: tools.map((t) => t.definition),
+      messages,
+    });
+
+    messages.push({ role: "assistant", content: response.content });
+
+    for (const block of response.content) {
+      if (block.type === "text" && block.text.trim()) {
+        console.log(`💬 ${block.text.trim()}`);
+      }
+    }
+
+    if (response.stop_reason === "end_turn") {
+      console.log("✅ Agent completed (end_turn)");
+      break;
+    }
+
+    const toolUseBlocks = response.content.filter((b) => b.type === "tool_use");
+    if (toolUseBlocks.length === 0) {
+      console.log("✅ Agent completed (no tool calls)");
+      break;
+    }
+
+    const toolResults: Anthropic.ToolResultBlockParam[] = [];
+    for (const block of toolUseBlocks) {
+      if (block.type !== "tool_use") continue;
+      const tool = tools.find((t) => t.definition.name === block.name);
+
+      if (!tool) {
+        console.warn(`⚠️ Unknown tool: ${block.name}`);
+        toolResults.push({
+          type: "tool_result",
+          tool_use_id: block.id,
+          content: `Error: unknown tool "${block.name}"`,
+          is_error: true,
+        });
+        continue;
+      }
+
+      console.log(`🔧 ${block.name}(${JSON.stringify(block.input)})`);
+      try {
+        const result = await tool.handler(block.input as Record<string, unknown>);
+        console.log(`   ↩`, result);
+        toolResults.push({
+          type: "tool_result",
+          tool_use_id: block.id,
+          content: JSON.stringify(result),
+        });
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.error(`   ❌ Tool error: ${msg}`);
+        toolResults.push({
+          type: "tool_result",
+          tool_use_id: block.id,
+          content: `Error: ${msg}`,
+          is_error: true,
+        });
+      }
+    }
+
+    messages.push({ role: "user", content: toolResults });
+  }
+}
+
+
 /**
  * Simple text completion.
  */
