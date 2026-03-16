@@ -6,7 +6,8 @@
   "scripts": {
     "task": "tsx src/index.ts",
     "s01e01": "tsx src/tasks/s01e01.ts",
-    "s01e02": "tsx src/tasks/s01e02.ts"
+    "s01e02": "tsx src/tasks/s01e02.ts",
+    "s01e03": "tsx src/tasks/s01e03.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
