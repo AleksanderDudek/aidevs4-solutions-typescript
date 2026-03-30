@@ -34,7 +34,8 @@ export async function run(): Promise<void> {
   if (!HUB_BASE) throw new Error("Missing HUB_BASE_URL in .env");
 
   // 1. Download the drone map
-  console.log("📋 Task: drone — bomb the dam near PWR6132PL");
+  const targetPlant = process.env.REACTOR_DEST ?? "";
+  console.log(`📋 Task: drone — bomb the dam near ${targetPlant}`);
   const mapPath = path.join(TASK_DIR, "drone.png");
   await fetchCached(`${HUB_BASE}/data/${apiKey}/drone.png`, mapPath);
 
@@ -45,7 +46,8 @@ export async function run(): Promise<void> {
   //    Sector (2,4) = bottom-middle has the most water (6.6% blue pixels)
   //    → This is the dam sector
   const DAM_SECTOR = { x: 2, y: 4 };
-  const POWER_PLANT_ID = "PWR6132PL";
+  const POWER_PLANT_ID = process.env.REACTOR_DEST;
+  if (!POWER_PLANT_ID) throw new Error("Missing REACTOR_DEST in .env");
 
   console.log(`🎯 Dam located at sector (${DAM_SECTOR.x}, ${DAM_SECTOR.y})`);
 

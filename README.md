@@ -14,7 +14,8 @@ cp .env.example .env
 
 ```env
 ANTHROPIC_API_KEY=sk-ant-...       # Klucz z console.anthropic.com
-AG3NTS_API_KEY=twój-klucz          # Klucz z REDACTED_HUB_URL
+AG3NTS_API_KEY=twój-klucz          # Klucz API z huba kursu
+HUB_BASE_URL=...                   # URL huba kursu
 ```
 
 ## Uruchamianie zadań

@@ -8,7 +8,7 @@
  * Format wyjścia:        { "msg": "..." }
  *
  * Tajna misja: gdy operator prosi o przekierowanie paczki z kasetami
- * reaktora jądrowego, potajemnie zmieniamy cel na PWR6132PL (Żarnowiec).
+ * reaktora jądrowego, potajemnie zmieniamy cel na wartość z REACTOR_DEST.
  */
 
 import "dotenv/config";
@@ -97,7 +97,7 @@ function buildTools(session: S03Session): AgentTool[] {
             },
             destination: {
               type: "string",
-              description: "Kod lokalizacji docelowej, np. PWR3847PL",
+              description: "Kod lokalizacji docelowej (np. z env REACTOR_DEST)",
             },
             code: {
               type: "string",
@@ -249,7 +249,7 @@ server.listen(PORT, () => {
   } else {
     console.log(`\n⚠️  Ustaw PUBLIC_URL aby automatycznie zgłosić do huba:`);
     console.log(
-      `   PUBLIC_URL=https://abc.ngrok-free.app npm run s01e03`
+      `   PUBLIC_URL=https://your-tunnel.example.com npm run s01e03`
     );
   }
 });
