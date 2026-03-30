@@ -6,7 +6,8 @@ import { runAgent, type AgentTool } from "../lib/llm/index.js";
 
 const TASK = "mailbox";
 const TASK_DIR = path.resolve("data", "s02e04");
-const HUB = "https://REDACTED_HUB_URL";
+const HUB = process.env.HUB_BASE_URL;
+if (!HUB) throw new Error("Missing HUB_BASE_URL in .env");
 
 if (!existsSync(TASK_DIR)) mkdirSync(TASK_DIR, { recursive: true });
 

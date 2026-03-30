@@ -24,7 +24,8 @@ const TASK_DIR = path.resolve("data", "s01e05");
 const HELP_CACHE = path.join(TASK_DIR, "help.json");
 const FLAG_FILE = path.join(TASK_DIR, "flag.txt");
 
-const HUB_VERIFY = `${process.env.HUB_BASE_URL ?? "https://REDACTED_HUB_URL"}/verify`;
+if (!process.env.HUB_BASE_URL) throw new Error("Missing HUB_BASE_URL in .env");
+const HUB_VERIFY = `${process.env.HUB_BASE_URL}/verify`;
 
 if (!existsSync(TASK_DIR)) mkdirSync(TASK_DIR, { recursive: true });
 

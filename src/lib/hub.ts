@@ -2,7 +2,8 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import path from "path";
 import type { HubRequest, HubResponse } from "../types/index.js";
 
-const HUB_BASE = process.env.HUB_BASE_URL ?? "https://REDACTED_HUB_URL";
+const HUB_BASE = process.env.HUB_BASE_URL;
+if (!HUB_BASE) throw new Error("Missing HUB_BASE_URL in .env");
 
 /**
  * Sends an answer to the hub and returns the response.

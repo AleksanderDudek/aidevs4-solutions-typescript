@@ -5,7 +5,8 @@ import { complete, runAgent, type AgentTool, type ContentBlock } from "../lib/ll
 
 const TASK = "electricity";
 const TASK_DIR = path.resolve("data", "s02e02");
-const HUB = "https://REDACTED_HUB_URL";
+const HUB = process.env.HUB_BASE_URL;
+if (!HUB) throw new Error("Missing HUB_BASE_URL in .env");
 const POSITIONS = [
   "1x1", "1x2", "1x3",
   "2x1", "2x2", "2x3",

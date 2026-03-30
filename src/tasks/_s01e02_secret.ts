@@ -1,15 +1,17 @@
 import "dotenv/config";
 
 const apiKey = process.env.AG3NTS_API_KEY!;
+const HUB_BASE = process.env.HUB_BASE_URL;
+if (!HUB_BASE) throw new Error("Missing HUB_BASE_URL in .env");
 
 const PLANTS: Record<string, { lat: number; lng: number; code: string }> = {
-  "Zabrze":               { lat: 50.326, lng: 18.786, code: "REDACTED_REACTOR_CODE" },
-  "Piotrków Trybunalski": { lat: 51.403, lng: 19.701, code: "REDACTED_REACTOR_CODE" },
-  "Grudziądz":            { lat: 53.485, lng: 18.754, code: "REDACTED_REACTOR_CODE" },
-  "Tczew":                { lat: 53.777, lng: 18.781, code: "REDACTED_REACTOR_CODE" },
-  "Radom":                { lat: 51.403, lng: 21.146, code: "REDACTED_REACTOR_CODE" },
-  "Chelmno":              { lat: 53.351, lng: 18.434, code: "REDACTED_REACTOR_CODE" },
-  "Żarnowiec":            { lat: 54.617, lng: 18.121, code: "REDACTED_REACTOR_CODE" },
+  "Zabrze":               { lat: 50.326, lng: 18.786, code: "PWR3847PL" },
+  "Piotrków Trybunalski": { lat: 51.403, lng: 19.701, code: "PWR5921PL" },
+  "Grudziądz":            { lat: 53.485, lng: 18.754, code: "PWR7264PL" },
+  "Tczew":                { lat: 53.777, lng: 18.781, code: "PWR1593PL" },
+  "Radom":                { lat: 51.403, lng: 21.146, code: "PWR8406PL" },
+  "Chelmno":              { lat: 53.351, lng: 18.434, code: "PWR2758PL" },
+  "Żarnowiec":            { lat: 54.617, lng: 18.121, code: "PWR6132PL" },
 };
 
 function haversine(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -21,7 +23,7 @@ function haversine(lat1: number, lon1: number, lat2: number, lon2: number): numb
 }
 
 async function getLocations(name: string, surname: string) {
-  const res = await fetch("https://REDACTED_HUB_URL/api/location", {
+  const res = await fetch(`${HUB_BASE}/api/location`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name, surname, apikey: apiKey }),
@@ -30,7 +32,7 @@ async function getLocations(name: string, surname: string) {
 }
 
 async function getAccessLevel(name: string, surname: string, birthYear: number) {
-  const res = await fetch("https://REDACTED_HUB_URL/api/accesslevel", {
+  const res = await fetch(`${HUB_BASE}/api/accesslevel`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name, surname, birthYear, apikey: apiKey }),
@@ -56,7 +58,7 @@ function nearestPlant(locations: Array<{ latitude?: number; longitude?: number; 
 }
 
 async function trySubmit(task: string, answer: unknown) {
-  const res = await fetch("https://REDACTED_HUB_URL/verify", {
+  const res = await fetch(`${HUB_BASE}/verify`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ task, answer, apikey: apiKey }),
@@ -85,7 +87,7 @@ async function run() {
   // Try Martin Handford with different birth years to see if there's a flag
   console.log("\n=== Martin Handford with various birth years ===");
   for (const year of [1955, 1956, 1957, 1991, 2000]) {
-    const res = await fetch("https://REDACTED_HUB_URL/api/accesslevel", {
+    const res = await fetch(`${HUB_BASE}/api/accesslevel`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: "Martin", surname: "Handford", birthYear: year, apikey: apiKey }),
@@ -105,7 +107,7 @@ async function run() {
     "Kowalczyk", "Kamiński", "Lewandowski", "Zieliński", "Szymański"
   ];
   for (const surname of waclawy) {
-    const res = await fetch("https://REDACTED_HUB_URL/api/location", {
+    const res = await fetch(`${HUB_BASE}/api/location`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: "Wacław", surname, apikey: apiKey }),
@@ -121,7 +123,7 @@ async function run() {
   // Try "Wally" as first name with common Polish surnames
   console.log("\n=== 'Wally' as first name ===");
   for (const surname of ["Kowalski", "Nowak", "Wiśniewski", "Handford"]) {
-    const res = await fetch("https://REDACTED_HUB_URL/api/location", {
+    const res = await fetch(`${HUB_BASE}/api/location`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: "Wally", surname, apikey: apiKey }),
@@ -136,7 +138,7 @@ async function run() {
   // New angle: Wally Handford + accesslevel API + various birth years?
   console.log("\n=== Wally Handford in accesslevel with various birth years ===");
   for (const year of [1956, 1957, 1986, 1991, 1993]) {
-    const res = await fetch("https://REDACTED_HUB_URL/api/accesslevel", {
+    const res = await fetch(`${HUB_BASE}/api/accesslevel`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: "Wally", surname: "Handford", birthYear: year, apikey: apiKey }),
@@ -149,11 +151,11 @@ async function run() {
   // Try task findhim with Wacław Jasiński (the Polish "Wally") + all plant codes
   console.log("\n=== Wacław Jasiński (Polish Wally) with ALL plant codes ===");
   const allPlants = [
-    "REDACTED_REACTOR_CODE", "REDACTED_REACTOR_CODE", "REDACTED_REACTOR_CODE", "REDACTED_REACTOR_CODE",
-    "REDACTED_REACTOR_CODE", "REDACTED_REACTOR_CODE", "REDACTED_REACTOR_CODE"
+    "PWR3847PL", "PWR5921PL", "PWR7264PL", "PWR1593PL",
+    "PWR8406PL", "PWR2758PL", "PWR6132PL"
   ];
   for (const plant of allPlants) {
-    const res = await fetch("https://REDACTED_HUB_URL/verify", {
+    const res = await fetch(`${HUB_BASE}/verify`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -173,13 +175,16 @@ async function run() {
   // Also try findhim with the "wrong" access level to get a different error
   // Maybe Wacław Jasiński's TRUE access level is 100 (like Martin Handford = -100)?
   console.log("\n=== Wacław Jasiński with accessLevel 100 + nearest plant ===");
-  const r = await fetch("https://REDACTED_HUB_URL/verify", {
+  const r = await fetch(`${HUB_BASE}/verify`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       task: "findhim",
-      answer: { name: "Wacław", surname: "Jasiński", accessLevel: 100, powerPlant: "REDACTED_REACTOR_CODE" },
+      answer: { name: "Wacław", surname: "Jasiński", accessLevel: 100, powerPlant: "PWR7264PL" },
       apikey: apiKey,
     }),
   });
   console.log("Wacław+100+Grudziądz:", JSON.stringify(await r.json()));
+}
+
+run().catch(console.error);

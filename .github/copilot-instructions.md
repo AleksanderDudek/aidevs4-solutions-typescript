@@ -6,8 +6,8 @@ TypeScript (ESM) project solving AI_devs 4 course tasks. Each task is an isolate
 
 **Stack:** Node.js ESM, TypeScript via `tsx`, `@anthropic-ai/sdk`, `papaparse`, `dotenv`  
 **LLM provider:** Anthropic Claude  
-**Hub base URL:** `https://REDACTED_HUB_URL`  
-**Env vars:** `AG3NTS_API_KEY` (hub), `ANTHROPIC_API_KEY` (Anthropic)
+**Hub base URL:** set via `HUB_BASE_URL` env var  
+**Env vars:** `AG3NTS_API_KEY` (hub), `ANTHROPIC_API_KEY` (Anthropic), `HUB_BASE_URL` (hub base)
 
 ---
 
@@ -166,7 +166,7 @@ callHubApi<T>(endpoint, body, apiKey)           // POST any /api/* endpoint
 
 - Always inject `apikey` through the helper — never construct raw requests inline
 - Check the hub response `code` field: `0` = success, negative = error
-- `message` on success often contains the flag `{FLG:...}`
+- `message` on success often contains a flag
 
 ---
 

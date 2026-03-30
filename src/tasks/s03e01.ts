@@ -109,7 +109,8 @@ export async function run(): Promise<void> {
   const apiKey = process.env.AG3NTS_API_KEY;
   if (!apiKey) throw new Error("Missing AG3NTS_API_KEY in .env");
 
-  const HUB_BASE = process.env.HUB_BASE_URL ?? "https://REDACTED_HUB_URL";
+  const HUB_BASE = process.env.HUB_BASE_URL;
+  if (!HUB_BASE) throw new Error("Missing HUB_BASE_URL in .env");
 
   // 1. Download and extract if needed
   const zipPath = path.join(TASK_DIR, "sensors.zip");

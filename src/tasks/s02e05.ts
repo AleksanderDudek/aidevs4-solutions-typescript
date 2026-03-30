@@ -30,10 +30,11 @@ export async function run(): Promise<void> {
   const apiKey = process.env.AG3NTS_API_KEY;
   if (!apiKey) throw new Error("Missing AG3NTS_API_KEY in .env");
 
-  const HUB_BASE = process.env.HUB_BASE_URL ?? "https://REDACTED_HUB_URL";
+  const HUB_BASE = process.env.HUB_BASE_URL;
+  if (!HUB_BASE) throw new Error("Missing HUB_BASE_URL in .env");
 
   // 1. Download the drone map
-  console.log("📋 Task: drone — bomb the dam near REDACTED_REACTOR_CODE");
+  console.log("📋 Task: drone — bomb the dam near PWR6132PL");
   const mapPath = path.join(TASK_DIR, "drone.png");
   await fetchCached(`${HUB_BASE}/data/${apiKey}/drone.png`, mapPath);
 
@@ -44,7 +45,7 @@ export async function run(): Promise<void> {
   //    Sector (2,4) = bottom-middle has the most water (6.6% blue pixels)
   //    → This is the dam sector
   const DAM_SECTOR = { x: 2, y: 4 };
-  const POWER_PLANT_ID = "REDACTED_REACTOR_CODE";
+  const POWER_PLANT_ID = "PWR6132PL";
 
   console.log(`🎯 Dam located at sector (${DAM_SECTOR.x}, ${DAM_SECTOR.y})`);
 

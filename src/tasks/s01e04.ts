@@ -39,7 +39,8 @@ async function analyseExcludedRoutesImage(): Promise<string> {
   }
 
   console.log("🖼️  Downloading trasy-wylaczone.png …");
-  const hubBase = process.env.HUB_BASE_URL ?? "https://REDACTED_HUB_URL";
+  const hubBase = process.env.HUB_BASE_URL;
+  if (!hubBase) throw new Error("Missing HUB_BASE_URL in .env");
   const imgRes = await fetch(`${hubBase}/dane/doc/trasy-wylaczone.png`);
   const buf = await imgRes.arrayBuffer();
   const b64 = Buffer.from(buf).toString("base64");

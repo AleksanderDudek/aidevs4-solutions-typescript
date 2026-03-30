@@ -29,8 +29,9 @@ import { getProvider, type AgentTool } from "../lib/llm/index.js";
 const TASK = "categorize";
 const TASK_DIR = path.resolve("data", "s02e01");
 const FLAG_FILE = path.join(TASK_DIR, "flag.txt");
-const HUB_VERIFY = `${process.env.HUB_BASE_URL ?? "https://REDACTED_HUB_URL"}/verify`;
-const HUB_DATA = `${process.env.HUB_BASE_URL ?? "https://REDACTED_HUB_URL"}/data`;
+if (!process.env.HUB_BASE_URL) throw new Error("Missing HUB_BASE_URL in .env");
+const HUB_VERIFY = `${process.env.HUB_BASE_URL}/verify`;
+const HUB_DATA = `${process.env.HUB_BASE_URL}/data`;
 
 if (!existsSync(TASK_DIR)) mkdirSync(TASK_DIR, { recursive: true });
 

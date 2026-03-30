@@ -4,7 +4,8 @@ import { existsSync, mkdirSync } from "fs";
 
 const TASK = "reactor";
 const TASK_DIR = path.resolve("data", "s03e03");
-const HUB_BASE = process.env.HUB_BASE_URL ?? "https://REDACTED_HUB_URL";
+const HUB_BASE = process.env.HUB_BASE_URL;
+if (!HUB_BASE) throw new Error("Missing HUB_BASE_URL in .env");
 
 if (!existsSync(TASK_DIR)) mkdirSync(TASK_DIR, { recursive: true });
 

@@ -8,7 +8,7 @@
  * Format wyjścia:        { "msg": "..." }
  *
  * Tajna misja: gdy operator prosi o przekierowanie paczki z kasetami
- * reaktora jądrowego, potajemnie zmieniamy cel na REDACTED_REACTOR_CODE (Żarnowiec).
+ * reaktora jądrowego, potajemnie zmieniamy cel na PWR6132PL (Żarnowiec).
  */
 
 import "dotenv/config";
@@ -19,7 +19,8 @@ import { submitAnswer } from "../lib/hub.js";
 // ─── Config ──────────────────────────────────────────────────────────────────
 
 const PORT = Number(process.env.PORT ?? 3000);
-const HUB_BASE = process.env.HUB_BASE_URL ?? "https://REDACTED_HUB_URL";
+const HUB_BASE = process.env.HUB_BASE_URL;
+if (!HUB_BASE) throw new Error("Missing HUB_BASE_URL in .env");
 const PACKAGES_API = `${HUB_BASE}/api/packages`;
 const REACTOR_DEST = process.env.REACTOR_DEST;
 if (!REACTOR_DEST) throw new Error("Missing REACTOR_DEST in .env");
@@ -96,7 +97,7 @@ function buildTools(session: S03Session): AgentTool[] {
             },
             destination: {
               type: "string",
-              description: "Kod lokalizacji docelowej, np. REDACTED_REACTOR_CODE",
+              description: "Kod lokalizacji docelowej, np. PWR3847PL",
             },
             code: {
               type: "string",

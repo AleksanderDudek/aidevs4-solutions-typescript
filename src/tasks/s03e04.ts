@@ -24,7 +24,8 @@ import path from "path";
 const PORT = Number(process.env.PORT ?? 3333);
 const PUBLIC_URL = process.env.PUBLIC_URL; // np. https://xxx.ngrok-free.app
 const TASK = "negotiations";
-const HUB_URL = "https://REDACTED_HUB_URL/verify";
+const HUB_URL = `${process.env.HUB_BASE_URL}/verify`;
+if (!process.env.HUB_BASE_URL) throw new Error("Missing HUB_BASE_URL in .env");
 
 const apiKey = process.env.AG3NTS_API_KEY;
 if (!apiKey) throw new Error("Missing AG3NTS_API_KEY in .env");
