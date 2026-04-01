@@ -21,7 +21,8 @@
     "s03e04": "tsx src/tasks/s03e04.ts",
     "s03e05": "tsx src/tasks/s03e05.ts",
     "s04e01": "tsx src/tasks/s04e01.ts",
-    "s04e02": "tsx src/tasks/s04e02.ts"
+    "s04e02": "tsx src/tasks/s04e02.ts",
+    "s04e03": "tsx src/tasks/s04e03.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
